@@ -1,7 +1,7 @@
 ## GMTtools
 ## created on 3/5/2014 by Zichen Wang
 
-from fileIO import read_gmt, sortD
+from fileIO import sortD
 import operator, random
 from scipy.stats import fisher_exact, pearsonr
 import numpy as np

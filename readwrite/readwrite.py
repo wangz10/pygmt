@@ -1,8 +1,7 @@
 """
 Functions for reading files into GMT and output a GMT object into files
 """
-import pygmt
-
+import pygmt as gmt
 def read_gmt(fn, fuzzy=False):
 	"""read a txt file into GMT object"""
 	d = {}

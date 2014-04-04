@@ -1,0 +1,1 @@
+from pygmt.algorithms.algorithms import *

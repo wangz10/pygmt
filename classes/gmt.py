@@ -4,6 +4,8 @@ Author: Zichen Wang
 3/31/2014
 
 '''
+from pygmt import algorithms
+from pygmt.readwrite import *
 
 __author__ = "Zichen Wang (wangzc921@gmail.com) "
 
@@ -12,9 +14,11 @@ class GMT(object):
 	def __init__(self, data=None, fuzzy=False):
 		self.meta = {}
 		self.terms = {}
+		self.genes = {} # a container for genes with occurrence as value
 		self.fuzzy = fuzzy
 		if data is not None:
 			self.terms, self.fuzzy = to_gmt(data)
+			self.genes = algorithms.count_gene_occ(self.terms)
 
 	@property
 	def name(self):
@@ -46,23 +50,15 @@ class GMT(object):
 
 
 def to_gmt(data):
-	if type(data) == dict:
-		for key in data:
-			if type(data[key]) != dict:
-				fuzzy = False
-			else:
-				fuzzy = True
-		
+	if type(data) == dict: ## data type must be a dictionary
+		_key = data.keys()[0]
+		if type(data[_key]) != dict:
+			fuzzy = False
+		else:
+			fuzzy = True
 		return data, fuzzy
 	else:
 		raise TypeError("input can't be converted to a GMT")
 
 
 ## testing block below:
-
-d = dict(a=1,b=2)
-g = GMT(d)
-g2 = GMT(1)
-# print g
-print g.terms
-print g.fuzzy

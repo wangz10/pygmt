@@ -2,6 +2,8 @@
 Functions for reading files into GMT and output a GMT object into files
 """
 import pygmt as gmt
+import operator
+
 def read_gmt(fn, fuzzy=False):
 	"""read a txt file into GMT object"""
 	d = {}
@@ -27,6 +29,9 @@ def read_gmt(fn, fuzzy=False):
 
 def write_gmt(g, outfn, fuzzy=False):
 	d = g.terms
+	obj_fuzzy = g.fuzzy
+	if obj_fuzzy != fuzzy:
+		print 'the output format is in different type of GMT!'
 	with open (outfn, 'w') as out:
 		for k in d:
 			out.write(k + '\tna\t')
@@ -40,4 +45,5 @@ def write_gmt(g, outfn, fuzzy=False):
 				for gene, val in sorted_d:
 					out.write(gene + ',' + str(val) + '\t')
 				out.write('\n')
+	return			
 

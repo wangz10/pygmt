@@ -60,5 +60,3 @@ def to_gmt(data):
 	else:
 		raise TypeError("input can't be converted to a GMT")
 
-
-## testing block below:

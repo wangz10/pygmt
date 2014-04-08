@@ -50,4 +50,16 @@ def gmtT(gmt):
 	gmt.terms = termsT
 	return gmt
 
+def union(gmt1, gmt2):
+	"""union two gmt objects, may wanna extend to more..."""
+	d1 = gmt1.term
+	d2 = gmt2.term
+	d1.update(d2)
+	d_gene_occ = count_gene_occ(d1)
+
+	gmt = GMT(d1)
+	gmt.genes = d_gene_occ
+
+	return gmt
+	
 

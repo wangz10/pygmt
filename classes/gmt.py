@@ -11,14 +11,15 @@ __author__ = "Zichen Wang (wangzc921@gmail.com) "
 
 class GMT(object):
 
-	def __init__(self, data=None, fuzzy=False):
+	def __init__(self, data=None, fuzzy=False, count=False):
 		self.meta = {}
 		self.terms = {}
 		self.genes = {} # a container for genes with occurrence as value
 		self.fuzzy = fuzzy
 		if data is not None:
 			self.terms, self.fuzzy = to_gmt(data)
-			# self.genes = algorithms.count_gene_occ(self.terms)
+			if count:
+				self.genes = algorithms.count_gene_occ(self.terms)
 
 	@property
 	def name(self):

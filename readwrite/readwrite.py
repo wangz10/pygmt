@@ -4,8 +4,9 @@ Functions for reading files into GMT and output a GMT object into files
 import pygmt as pg
 import operator
 
-def read_gmt(fn, fuzzy=False):
-	"""read a txt file into GMT object"""
+def read_gmt(fn, fuzzy=False, count=False):
+	"""read a txt file into GMT object, 
+	count specifies whether count the gene frequency"""
 	d = {}
 	with open (fn) as f:
 		if not fuzzy:
@@ -24,7 +25,10 @@ def read_gmt(fn, fuzzy=False):
 					gene, val = geneVal.split(',')
 					val = float(val)
 					d[term][gene] = val
-	g = pg.GMT(d)
+	if count:
+		g = pg.GMT(d, count=count)
+	else:
+		g = pg.GMT(d)
 	return g
 
 def write_gmt(g, outfn, fuzzy=False, reverse=True):
@@ -47,23 +51,30 @@ def write_gmt(g, outfn, fuzzy=False, reverse=True):
 				out.write('\n')
 	return			
 
-def write_df(g, outfn, binarized=True, order=None placeholder='NA'):
+def write_df(g, outfn, binarized=True, rorder=None, corder=None, placeholder='NA'):
 	"""function that write a gmt object into a dataframe format,
 	with genes being col names and terms being row names.
 	vals are 1/0 if binarized == True; vals are fuzzy values otherwise;
-	order: (list of genes)
-		specifies the subset and the order of rows(genes) in the dataframe"""
+	rorder: (list of terms)
+		specifies the subset and the order of rows(terms) in the dataframe
+	corder: (list of genes)
+		specifies the subset and the order of rows(genes) in the dataframe
+		"""
 	d = g.terms
+	if rorder:
+		assert len(set(rorder) & set(d)) == len(rorder)
+	else:
+		rorder = d.keys()
 	genes = g.genes.keys()
-	if order:
-		assert len(set(order) & set(genes)) == len(order)
-		genes = order
+	if corder:
+		assert len(set(corder) & set(genes)) == len(corder)
+		genes = corder
 	with open (outfn, 'w') as out:
-		out.write('\t')
+		out.write('#\t')
 		for gene in genes: ## write col names
 			out.write(gene + '\t')
 		out.write('\n')
-		for term in d: ## write rows
+		for term in rorder: ## write rows
 			out.write(term + '\t')
 			for gene in genes:
 				if binarized:
@@ -76,7 +87,7 @@ def write_df(g, outfn, binarized=True, order=None placeholder='NA'):
 						out.write(str(d[term][gene]) + '\t')
 					else:
 						out.write(placeholder + '\t')
-				out.write('\n')
+			out.write('\n')
 	return
 
 

@@ -18,7 +18,7 @@ class GMT(object):
 		self.fuzzy = fuzzy
 		if data is not None:
 			self.terms, self.fuzzy = to_gmt(data)
-			self.genes = algorithms.count_gene_occ(self.terms)
+			# self.genes = algorithms.count_gene_occ(self.terms)
 
 	@property
 	def name(self):

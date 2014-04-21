@@ -4,6 +4,8 @@ Author: Zichen Wang
 3/31/2014
 
 """
+import operator
+import pygmt as pg
 
 def count_gene_occ(d):
 	d_gene_occ = {}
@@ -52,8 +54,8 @@ def gmtT(gmt):
 
 def union(gmt1, gmt2):
 	"""union two gmt objects, may wanna extend to more..."""
-	d1 = gmt1.term
-	d2 = gmt2.term
+	d1 = gmt1.terms
+	d2 = gmt2.terms
 	d1.update(d2)
 	d_gene_occ = count_gene_occ(d1)
 
@@ -62,4 +64,25 @@ def union(gmt1, gmt2):
 
 	return gmt
 	
+def subset(gmt, terms):
+	"""subset a gmt objects by a list/set of terms"""
+	d = gmt.terms
+	terms_sub = dict((term, d[term]) for term in terms)
+	gmt.terms = terms_sub
+	return gmt
 
+def unify_length(gmt, length=None, reverse=True):
+	"""keep top genes for each gmt lines in decreasing order (default)
+	of the fuzzy value """
+	d = gmt.terms
+	terms_new = {}
+	for term in d:
+		sorted_d = sorted(d[term].iteritems(), key=operator.itemgetter(1), reverse=reverse)
+		if length <= len(sorted_d):
+			terms_new[term] = dict(sorted_d[0:length])
+		else:
+			terms_new[term] = dict(sorted_d)
+	g = pg.GMT()
+	g.terms = terms_new
+	g.genes = count_gene_occ(terms_new)
+	return g

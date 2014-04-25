@@ -5,6 +5,8 @@ Author: Zichen Wang
 
 """
 import operator
+from collections import Counter
+from scipy.stats import fisher_exact
 import pygmt as pg
 
 def count_gene_occ(d):
@@ -15,9 +17,8 @@ def count_gene_occ(d):
 			genes += d[k]
 		else:
 			genes += d[k].keys()
-	gene_set = set(genes)
-	for gene in gene_set:
-		d_gene_occ[gene] = genes.count(gene)
+	c = Counter(genes)
+	d_gene_occ = dict(c)
 	return d_gene_occ
 
 
@@ -86,3 +87,28 @@ def unify_length(gmt, length=None, reverse=True):
 	g.terms = terms_new
 	g.genes = count_gene_occ(terms_new)
 	return g
+
+def cross_enrichment(gmt1, gmt2, method='fisher',outfn=None, universe=20000):
+	"""a function performing enrichment analysis for pairwise terms in two gmts"""
+	with open (outfn, 'w') as out:
+		out.write('#\t') ## write header
+		for term2 in gmt2.terms: 
+			out.write(term2+'\t') 
+		out.write('\n')
+		i = 1
+		for term1 in gmt1.terms:
+			out.write(term1 + '\t')
+			genes1 = set(gmt1.terms[term1])
+			print 'processing ', term1, i
+			i += 1
+			for term2 in gmt2.terms:
+				genes2 = set(gmt2.terms[term2])
+				a = len(genes1 & genes2)
+				b = len(genes1)
+				c = len(genes2)
+				if method == 'fisher':
+					_, p_val = fisher_exact([[a,b],[c,universe]])
+				out.write(str(p_val) + '\t')
+			out.write('\n')
+	return
+

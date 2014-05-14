@@ -3,6 +3,7 @@ Functions for reading files into GMT and output a GMT object into files
 """
 import pygmt as pg
 import operator
+import warnings
 
 def read_gmt(fn, fuzzy=False, count=False):
 	"""read a txt file into GMT object, 
@@ -51,7 +52,7 @@ def write_gmt(g, outfn, fuzzy=False, reverse=True):
 				out.write('\n')
 	return			
 
-def write_df(g, outfn, binarized=True, rorder=None, corder=None, placeholder='NA'):
+def write_df(g, outfn, binarized=True, rorder=None, corder=None, placeholder='0'):
 	"""function that write a gmt object into a dataframe format,
 	with genes being col names and terms being row names.
 	vals are 1/0 if binarized == True; vals are fuzzy values otherwise;
@@ -62,7 +63,10 @@ def write_df(g, outfn, binarized=True, rorder=None, corder=None, placeholder='NA
 		"""
 	d = g.terms
 	if rorder:
-		assert len(set(rorder) & set(d)) == len(rorder)
+		if len(set(rorder) & set(d)) != len(rorder):
+			warnings.warn(
+				'Additional terms in rorder do not exist in GMT object, they are filled with 0',
+				RuntimeWarning)
 	else:
 		rorder = d.keys()
 	genes = g.genes.keys()
@@ -76,18 +80,23 @@ def write_df(g, outfn, binarized=True, rorder=None, corder=None, placeholder='NA
 		out.write('\n')
 		for term in rorder: ## write rows
 			out.write(term + '\t')
-			for gene in genes:
-				if binarized:
-					if gene in d[term]:
-						out.write('1\t')
+			if term in d:
+				for gene in genes:
+					if binarized:
+						if gene in d[term]:
+							out.write('1\t')
+						else:
+							out.write('0\t')
 					else:
-						out.write('0\t')
-				else:
-					if gene in d[term]:
-						out.write(str(d[term][gene]) + '\t')
-					else:
-						out.write(placeholder + '\t')
-			out.write('\n')
+						if gene in d[term]:
+							out.write(str(d[term][gene]) + '\t')
+						else:
+							out.write(placeholder + '\t')
+				out.write('\n')
+			else: ## additional terms not in d
+				for gene in genes:
+					out.write('0\t')
+				out.write('\n')
 	return
 
 

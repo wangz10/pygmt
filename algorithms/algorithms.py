@@ -9,7 +9,14 @@ from collections import Counter
 from scipy.stats import fisher_exact
 import pygmt as pg
 
+def sortD(d, reverse=True):
+	"""sort dict by value in decreasing order (default)"""
+	assert type(d) == dict
+	sorted_d = sorted(d.iteritems(), key=operator.itemgetter(1), reverse=reverse)
+	return sorted_d
+
 def count_gene_occ(d):
+	"""return a dictionary of gene and their occurrences"""
 	d_gene_occ = {}
 	genes = []
 	for k in d:

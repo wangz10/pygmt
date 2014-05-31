@@ -33,12 +33,12 @@ def cast_fuzzy(gmt, val=1.0):
 	""" cast a crisp gmt object to a fuzzy one by
 	assigning an arbitury value 1.0 by default.
 	"""
-	assert type(gmt.fuzzy) == False
+	assert gmt.fuzzy == False
 	terms_original = gmt.terms
 	terms_new = {}
 	for term in terms_original:
 		terms_new[term] = {}
-		for gene in terms_original[k]:
+		for gene in terms_original[term]:
 			terms_new[term][gene] = val
 	gmt.terms = terms_new
 	gmt.fuzzy = True
@@ -75,9 +75,9 @@ def union(gmt1, gmt2):
 def subset(gmt, terms):
 	"""subset a gmt objects by a list/set of terms"""
 	d = gmt.terms
-	terms_sub = dict((term, d[term]) for term in terms)
-	gmt.terms = terms_sub
-	return gmt
+	terms_sub = dict((term, d[term]) for term in terms if term in d)
+	gmt_sub = pg.GMT(terms_sub)
+	return gmt_sub
 
 def unify_length(gmt, length=None, reverse=True):
 	"""keep top genes for each gmt lines in decreasing order (default)

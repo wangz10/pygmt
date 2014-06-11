@@ -26,10 +26,7 @@ def read_gmt(fn, fuzzy=False, count=False):
 					gene, val = geneVal.split(',')
 					val = float(val)
 					d[term][gene] = val
-	if count:
-		g = pg.GMT(d, count=count)
-	else:
-		g = pg.GMT(d)
+	g = pg.GMT(d, count=count)
 	return g
 
 def write_gmt(g, outfn, fuzzy=False, reverse=True):

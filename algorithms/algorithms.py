@@ -7,6 +7,7 @@ Author: Zichen Wang
 import operator
 from collections import Counter
 from scipy.stats import fisher_exact
+from math import floor
 import pygmt as pg
 
 def sortD(d, reverse=True):
@@ -94,6 +95,30 @@ def unify_length(gmt, length=None, reverse=True):
 	g.terms = terms_new
 	g.genes = count_gene_occ(terms_new)
 	return g
+
+def remove_by_occ(gmt, percent):
+	"""remove genes in the gmt if the occurrences of genes lie in the
+	percentile specified:
+	e.g.: percent = 10 # remove top 10% """
+	d_gene_occ = gmt.genes
+	sorted_gene_occ = sortD(d_gene_occ)
+	num_rm_genes = floor(len(d_gene_occ) * percent * 0.01)
+	genes_to_rm = []
+	for i, (gene, occ) in enumerate(sorted_gene_occ, start=1):
+		if i != num_rm_genes:
+			genes_to_rm.append(gene)
+		else:	
+			break
+	d = gmt.terms
+	d_new = {}
+	for term in d:
+		d_new[term] = [gene for gene in d[term] if gene not in genes_to_rm]
+		if len(d_new[term]) == 0:
+			del d_new[term]
+	g = pg.GMT()
+	g.terms = d_new
+	return g
+
 
 def cross_enrichment(gmt1, gmt2, method='fisher',outfn=None, universe=20000):
 	"""a function performing enrichment analysis for pairwise terms in two gmts"""

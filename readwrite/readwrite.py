@@ -33,7 +33,9 @@ def write_gmt(g, outfn, fuzzy=False, reverse=True):
 	d = g.terms
 	obj_fuzzy = g.fuzzy
 	if obj_fuzzy != fuzzy:
-		print 'the output format is in different type of GMT!'
+		warnings.warn(
+			'The output GMT format (fuzzy %s) is different from the original type of GMT (fuzzy %s)'%(fuzzy, g.fuzzy),
+			RuntimeWarning)
 	with open (outfn, 'w') as out:
 		for k in d:
 			out.write(k + '\tna\t')
